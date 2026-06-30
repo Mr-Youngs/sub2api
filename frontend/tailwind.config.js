@@ -5,47 +5,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 主色调 - Teal/Cyan 青色系
+        // 主色调 - Gold / Ink
         primary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
-          950: '#042f2e'
+          50: '#fff9e6',
+          100: '#fdf0c5',
+          200: '#fae09a',
+          300: '#f5d16a',
+          400: '#efc940',
+          500: '#f0c845',
+          600: '#dda931',
+          700: '#c08d27',
+          800: '#9c7120',
+          900: '#7b5818',
+          950: '#5a4010'
         },
-        // 辅助色 - 深蓝灰
+        // 辅助色 - 深金
         accent: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617'
+          50: '#fff7df',
+          100: '#feebbb',
+          200: '#fddf93',
+          300: '#f9cf63',
+          400: '#f3bd3c',
+          500: '#dda931',
+          600: '#c28f28',
+          700: '#a47421',
+          800: '#825a1b',
+          900: '#644416',
+          950: '#48300f'
         },
-        // 深色模式背景
+        // 深色模式背景 - Ink / Blue-gray
         dark: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617'
+          50: '#f4f5f8',
+          100: '#e8ebf1',
+          200: '#d1d6e2',
+          300: '#b0b8c8',
+          400: '#8790a6',
+          500: '#65708a',
+          600: '#4d566d',
+          700: '#3b4256',
+          800: '#2f3444',
+          900: '#292c3b',
+          950: '#1f2230'
         }
       },
       fontFamily: {
@@ -65,22 +65,22 @@ export default {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
       },
       boxShadow: {
-        glass: '0 8px 32px rgba(0, 0, 0, 0.08)',
-        'glass-sm': '0 4px 16px rgba(0, 0, 0, 0.06)',
-        glow: '0 0 20px rgba(20, 184, 166, 0.25)',
-        'glow-lg': '0 0 40px rgba(20, 184, 166, 0.35)',
-        card: '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 10px 40px rgba(0, 0, 0, 0.08)',
+        glass: '0 6px 18px rgba(31, 34, 48, 0.06)',
+        'glass-sm': '0 2px 8px rgba(31, 34, 48, 0.05)',
+        glow: '0 0 14px rgba(240, 200, 69, 0.15)',
+        'glow-lg': '0 0 28px rgba(240, 200, 69, 0.2)',
+        card: '0 1px 2px rgba(31, 34, 48, 0.05)',
+        'card-hover': '0 6px 18px rgba(31, 34, 48, 0.08)',
         'inner-glow': 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-primary': 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-        'gradient-dark': 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+        'gradient-primary': 'linear-gradient(135deg, #f0c845 0%, #dda931 100%)',
+        'gradient-dark': 'linear-gradient(135deg, #292c3b 0%, #1f2230 100%)',
         'gradient-glass':
           'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
         'mesh-gradient':
-          'radial-gradient(at 40% 20%, rgba(20, 184, 166, 0.12) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%), radial-gradient(at 0% 50%, rgba(20, 184, 166, 0.08) 0px, transparent 50%)'
+          'radial-gradient(at 40% 20%, rgba(240, 200, 69, 0.12) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(221, 169, 49, 0.08) 0px, transparent 50%), radial-gradient(at 0% 50%, rgba(41, 44, 59, 0.06) 0px, transparent 50%)'
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',
