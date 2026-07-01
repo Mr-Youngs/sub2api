@@ -1,0 +1,14 @@
+{$SUB2API_DOMAIN} {
+    encode zstd gzip
+
+    @api path /api/*
+    header @api Cache-Control "no-store"
+
+    reverse_proxy sub2api:8080 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up CF-Connecting-IP {http.request.header.CF-Connecting-IP}
+    }
+}

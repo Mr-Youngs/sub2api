@@ -49,6 +49,7 @@ pnpm-debug.log*
 # 环境配置
 # ===================
 .env
+.env.sub2api
 .env.local
 .env.*.local
 *.env

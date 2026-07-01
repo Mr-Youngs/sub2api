@@ -1,0 +1,122 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: sub2api-caddy
+    restart: unless-stopped
+    env_file:
+      - .env.sub2api
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.sub2api:/etc/caddy/Caddyfile:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+    depends_on:
+      - sub2api
+    networks:
+      - sub2api-net
+
+  sub2api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: mr-youngs/sub2api:custom
+    container_name: sub2api
+    restart: unless-stopped
+    env_file:
+      - .env.sub2api
+    environment:
+      AUTO_SETUP: "true"
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      SERVER_MODE: release
+      RUN_MODE: standard
+
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: sub2api
+      DATABASE_PASSWORD: ${SUB2API_DB_PASSWORD}
+      DATABASE_DBNAME: sub2api
+      DATABASE_SSLMODE: disable
+      DATABASE_MAX_OPEN_CONNS: ${DATABASE_MAX_OPEN_CONNS:-50}
+      DATABASE_MAX_IDLE_CONNS: ${DATABASE_MAX_IDLE_CONNS:-10}
+      DATABASE_CONN_MAX_LIFETIME_MINUTES: ${DATABASE_CONN_MAX_LIFETIME_MINUTES:-30}
+      DATABASE_CONN_MAX_IDLE_TIME_MINUTES: ${DATABASE_CONN_MAX_IDLE_TIME_MINUTES:-5}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: 0
+      REDIS_POOL_SIZE: ${REDIS_POOL_SIZE:-256}
+      REDIS_MIN_IDLE_CONNS: ${REDIS_MIN_IDLE_CONNS:-10}
+
+      ADMIN_EMAIL: ${SUB2API_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${SUB2API_ADMIN_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY}
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./sub2api_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sub2api-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "5", "-O", "/dev/null", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sub2api-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.sub2api
+    environment:
+      POSTGRES_USER: sub2api
+      POSTGRES_PASSWORD: ${SUB2API_DB_PASSWORD}
+      POSTGRES_DB: sub2api
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - sub2api-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sub2api -d sub2api"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: sub2api-redis
+    restart: unless-stopped
+    env_file:
+      - .env.sub2api
+    command: >
+      sh -c 'redis-server
+      --save 60 1
+      --appendonly yes
+      --appendfsync everysec
+      --requirepass "$REDIS_PASSWORD"'
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - sub2api-net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  sub2api-net:
+    driver: bridge
