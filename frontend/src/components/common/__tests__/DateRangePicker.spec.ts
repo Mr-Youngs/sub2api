@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 
@@ -34,6 +34,10 @@ const formatLocalDate = (date: Date): string => {
 }
 
 describe('DateRangePicker', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
   it('uses last 24 hours as the default recognized preset', () => {
     const now = new Date()
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
@@ -70,13 +74,18 @@ describe('DateRangePicker', () => {
     })
 
     await wrapper.find('.date-picker-trigger').trigger('click')
-    const presetButton = wrapper.findAll('.date-picker-preset').find((node) =>
-      node.text().includes('Last 24 Hours')
+    const presetButton = Array.from(document.body.querySelectorAll<HTMLButtonElement>('.date-picker-preset')).find(
+      (node) => node.textContent?.includes('Last 24 Hours')
     )
     expect(presetButton).toBeDefined()
 
-    await presetButton!.trigger('click')
-    await wrapper.find('.date-picker-apply').trigger('click')
+    presetButton!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await wrapper.vm.$nextTick()
+
+    const applyButton = document.body.querySelector<HTMLButtonElement>('.date-picker-apply')
+    expect(applyButton).toBeTruthy()
+    applyButton!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await wrapper.vm.$nextTick()
 
     const nowAfterClick = new Date()
     const yesterdayAfterClick = new Date(nowAfterClick.getTime() - 24 * 60 * 60 * 1000)
@@ -92,5 +101,27 @@ describe('DateRangePicker', () => {
         preset: 'last24Hours'
       }
     ])
+  })
+
+  it('teleports the dropdown to body to avoid card stacking conflicts', async () => {
+    const today = formatLocalDate(new Date())
+
+    const wrapper = mount(DateRangePicker, {
+      props: {
+        startDate: today,
+        endDate: today
+      },
+      global: {
+        stubs: {
+          Icon: true
+        }
+      }
+    })
+
+    await wrapper.find('.date-picker-trigger').trigger('click')
+
+    const dropdown = document.body.querySelector('.date-picker-dropdown')
+    expect(dropdown).toBeTruthy()
+    expect(dropdown?.parentElement).toBe(document.body)
   })
 })

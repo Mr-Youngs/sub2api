@@ -59,7 +59,7 @@
             <tr
               v-for="log in rows"
               :key="log.id"
-              class="group cursor-pointer transition-colors hover:bg-gray-50/80 dark:hover:bg-dark-800/50"
+              class="group cursor-pointer transition-colors hover:bg-[#FBF3D4] dark:hover:bg-[#373745]"
               @click="emit('openErrorDetail', log.id)"
             >
               <!-- Time -->
@@ -218,7 +218,7 @@
       </div>
 
       <!-- Pagination -->
-      <div class="bg-gray-50/50 dark:bg-dark-800/50">
+      <div class="bg-[#F8F7F2] dark:bg-[#1F2230]">
         <Pagination
           v-if="total > 0"
           :total="total"

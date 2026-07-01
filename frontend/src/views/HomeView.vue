@@ -45,7 +45,7 @@
             :href="docUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-white"
+            class="home-icon-button"
             :title="t('home.viewDocs')"
           >
             <Icon name="book" size="md" />
@@ -54,7 +54,7 @@
           <!-- Theme Toggle -->
           <button
             @click="toggleTheme"
-            class="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-dark-400 dark:hover:bg-dark-800 dark:hover:text-white"
+            class="home-icon-button"
             :title="isDark ? t('home.switchToLight') : t('home.switchToDark')"
           >
             <Icon v-if="isDark" name="sun" size="md" />
@@ -166,20 +166,20 @@
 
         <!-- Feature Tags - Centered -->
         <div class="mb-12 flex flex-wrap items-center justify-center gap-4 md:gap-6">
-          <div class="inline-flex items-center gap-2.5 rounded-md border border-gray-200 bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/80">
-            <Icon name="swap" size="sm" class="text-primary-600" />
+          <div class="home-glass-chip inline-flex items-center gap-2.5 px-4 py-2">
+            <Icon name="swap" size="sm" class="home-tag-icon" />
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{
               t('home.tags.subscriptionToApi')
             }}</span>
           </div>
-          <div class="inline-flex items-center gap-2.5 rounded-md border border-gray-200 bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/80">
-            <Icon name="shield" size="sm" class="text-primary-600" />
+          <div class="home-glass-chip inline-flex items-center gap-2.5 px-4 py-2">
+            <Icon name="shield" size="sm" class="home-tag-icon" />
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{
               t('home.tags.stickySession')
             }}</span>
           </div>
-          <div class="inline-flex items-center gap-2.5 rounded-md border border-gray-200 bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/80">
-            <Icon name="chart" size="sm" class="text-primary-600" />
+          <div class="home-glass-chip inline-flex items-center gap-2.5 px-4 py-2">
+            <Icon name="chart" size="sm" class="home-tag-icon" />
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{
               t('home.tags.realtimeBilling')
             }}</span>
@@ -189,9 +189,9 @@
         <!-- Features Grid -->
         <div class="mb-12 grid gap-6 md:grid-cols-3">
           <!-- Feature 1: Unified Gateway -->
-          <div class="group rounded-lg border border-gray-200 bg-white/90 p-6 backdrop-blur-sm transition-all duration-300 hover:shadow-sm dark:border-dark-700 dark:bg-[#292C3B]/80">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-[#292C3B] shadow-sm transition-transform group-hover:scale-105">
-              <Icon name="server" size="lg" class="text-white" />
+          <div class="home-feature-card group p-6">
+            <div class="home-icon-tile mb-4">
+              <Icon name="server" size="lg" />
             </div>
             <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('home.features.unifiedGateway') }}
@@ -202,21 +202,9 @@
           </div>
 
           <!-- Feature 2: Account Pool -->
-          <div class="group rounded-lg border border-gray-200 bg-white/90 p-6 backdrop-blur-sm transition-all duration-300 hover:shadow-sm dark:border-dark-700 dark:bg-[#292C3B]/80">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-[#F0C845] shadow-sm transition-transform group-hover:scale-105">
-              <svg
-                class="h-6 w-6 text-[#292C3B]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-                />
-              </svg>
+          <div class="home-feature-card group p-6">
+            <div class="home-icon-tile mb-4">
+              <Icon name="users" size="lg" />
             </div>
             <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('home.features.multiAccount') }}
@@ -227,21 +215,9 @@
           </div>
 
           <!-- Feature 3: Billing & Quota -->
-          <div class="group rounded-lg border border-gray-200 bg-white/90 p-6 backdrop-blur-sm transition-all duration-300 hover:shadow-sm dark:border-dark-700 dark:bg-[#292C3B]/80">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-[#DDA931] shadow-sm transition-transform group-hover:scale-105">
-              <svg
-                class="h-6 w-6 text-[#292C3B]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"
-                />
-              </svg>
+          <div class="home-feature-card group p-6">
+            <div class="home-icon-tile mb-4">
+              <Icon name="creditCard" size="lg" />
             </div>
             <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('home.features.balanceQuota') }}
@@ -264,51 +240,51 @@
 
         <div class="mb-16 flex flex-wrap items-center justify-center gap-4">
           <!-- Claude - Supported -->
-          <div class="flex items-center gap-2 rounded-lg border border-[#DDA931]/30 bg-white/90 px-5 py-3 backdrop-blur-sm dark:border-[#DDA931]/30 dark:bg-[#292C3B]/80">
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-[#292C3B]">
-              <span class="text-xs font-bold text-white">C</span>
+          <div class="home-provider-chip flex items-center gap-2 px-5 py-3">
+            <div class="home-provider-mark">
+              <span>C</span>
             </div>
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{ t('home.providers.claude') }}</span>
-            <span class="rounded-md bg-[#F0C845] px-1.5 py-0.5 text-[10px] font-medium text-[#292C3B]">{{ t('home.providers.supported') }}</span>
+            <span class="home-status-badge">{{ t('home.providers.supported') }}</span>
           </div>
           <!-- GPT - Supported -->
-          <div class="flex items-center gap-2 rounded-lg border border-[#DDA931]/30 bg-white/90 px-5 py-3 backdrop-blur-sm dark:border-[#DDA931]/30 dark:bg-[#292C3B]/80">
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-[#DDA931]">
-              <span class="text-xs font-bold text-[#292C3B]">G</span>
+          <div class="home-provider-chip flex items-center gap-2 px-5 py-3">
+            <div class="home-provider-mark">
+              <span>G</span>
             </div>
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">GPT</span>
-            <span class="rounded-md bg-[#F0C845] px-1.5 py-0.5 text-[10px] font-medium text-[#292C3B]">{{ t('home.providers.supported') }}</span>
+            <span class="home-status-badge">{{ t('home.providers.supported') }}</span>
           </div>
           <!-- Gemini - Supported -->
-          <div class="flex items-center gap-2 rounded-lg border border-[#DDA931]/30 bg-white/90 px-5 py-3 backdrop-blur-sm dark:border-[#DDA931]/30 dark:bg-[#292C3B]/80">
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-[#292C3B]">
-              <span class="text-xs font-bold text-white">G</span>
+          <div class="home-provider-chip flex items-center gap-2 px-5 py-3">
+            <div class="home-provider-mark">
+              <span>G</span>
             </div>
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{ t('home.providers.gemini') }}</span>
-            <span class="rounded-md bg-[#F0C845] px-1.5 py-0.5 text-[10px] font-medium text-[#292C3B]">{{ t('home.providers.supported') }}</span>
+            <span class="home-status-badge">{{ t('home.providers.supported') }}</span>
           </div>
           <!-- Antigravity - Supported -->
-          <div class="flex items-center gap-2 rounded-lg border border-[#DDA931]/30 bg-white/90 px-5 py-3 backdrop-blur-sm dark:border-[#DDA931]/30 dark:bg-[#292C3B]/80">
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-[#DDA931]">
-              <span class="text-xs font-bold text-white">A</span>
+          <div class="home-provider-chip flex items-center gap-2 px-5 py-3">
+            <div class="home-provider-mark">
+              <span>A</span>
             </div>
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{ t('home.providers.antigravity') }}</span>
-            <span class="rounded-md bg-[#F0C845] px-1.5 py-0.5 text-[10px] font-medium text-[#292C3B]">{{ t('home.providers.supported') }}</span>
+            <span class="home-status-badge">{{ t('home.providers.supported') }}</span>
           </div>
           <!-- More - Coming Soon -->
-          <div class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white/70 px-5 py-3 opacity-75 backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/60">
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-[#3B4256]">
-              <span class="text-xs font-bold text-white">+</span>
+          <div class="home-provider-chip flex items-center gap-2 px-5 py-3 opacity-75">
+            <div class="home-provider-mark home-provider-mark-muted">
+              <span>+</span>
             </div>
             <span class="text-sm font-medium text-gray-700 dark:text-dark-200">{{ t('home.providers.more') }}</span>
-            <span class="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-dark-700 dark:text-dark-300">{{ t('home.providers.soon') }}</span>
+            <span class="home-status-badge home-status-badge-muted">{{ t('home.providers.soon') }}</span>
           </div>
         </div>
       </div>
     </main>
 
     <!-- Footer -->
-    <footer class="relative z-10 border-t border-gray-200/50 px-6 py-8 dark:border-dark-800/50">
+    <footer class="relative z-10 px-6 py-8">
       <div
         class="mx-auto flex max-w-6xl flex-col items-center justify-center gap-4 text-center sm:flex-row sm:text-left"
       >
@@ -416,6 +392,141 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.home-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: rgba(41, 44, 59, 0.62);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.home-icon-button:hover {
+  color: #292c3b;
+  background: rgba(240, 200, 69, 0.16);
+}
+
+:global(html.dark .home-icon-button) {
+  color: rgba(254, 254, 253, 0.66);
+}
+
+:global(html.dark .home-icon-button:hover) {
+  color: #f0c845;
+  background: rgba(240, 200, 69, 0.12);
+}
+
+.home-glass-chip,
+.home-feature-card,
+.home-provider-chip {
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(254, 254, 253, 0.78);
+  box-shadow: 0 5px 14px rgba(31, 34, 48, 0.055);
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+}
+
+.home-feature-card,
+.home-provider-chip {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.home-feature-card:hover,
+.home-provider-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(31, 34, 48, 0.09);
+}
+
+:global(html.dark .home-glass-chip),
+:global(html.dark .home-feature-card),
+:global(html.dark .home-provider-chip) {
+  background: rgba(41, 44, 59, 0.82);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+}
+
+:global(html.dark .home-feature-card:hover),
+:global(html.dark .home-provider-chip:hover) {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+.home-tag-icon {
+  color: #dda931;
+}
+
+:global(html.dark .home-tag-icon) {
+  color: #f0c845;
+}
+
+.home-icon-tile,
+.home-provider-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #292c3b;
+  background:
+    linear-gradient(135deg, rgba(240, 200, 69, 0.96), rgba(221, 169, 49, 0.9)),
+    #f0c845;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 8px 18px rgba(41, 44, 59, 0.1);
+}
+
+.home-icon-tile {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 8px;
+  transition: transform 0.22s ease;
+}
+
+.home-feature-card:hover .home-icon-tile {
+  transform: scale(1.04);
+}
+
+.home-provider-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.home-provider-mark-muted {
+  color: #fefefd;
+  background: #3b4256;
+}
+
+.home-status-badge {
+  border-radius: 6px;
+  padding: 0.125rem 0.375rem;
+  font-size: 10px;
+  font-weight: 600;
+  color: #292c3b;
+  background: rgba(240, 200, 69, 0.22);
+}
+
+.home-status-badge-muted {
+  color: rgba(41, 44, 59, 0.68);
+  background: rgba(41, 44, 59, 0.08);
+}
+
+:global(html.dark .home-status-badge) {
+  color: #fefefd;
+  background: rgba(240, 200, 69, 0.16);
+}
+
+:global(html.dark .home-status-badge-muted) {
+  color: rgba(254, 254, 253, 0.68);
+  background: rgba(254, 254, 253, 0.08);
+}
+
 /* Terminal Container */
 .terminal-container {
   position: relative;
@@ -427,10 +538,7 @@ onMounted(() => {
   width: min(420px, calc(100vw - 3rem));
   background: linear-gradient(145deg, #292c3b 0%, #1f2230 100%);
   border-radius: 10px;
-  box-shadow:
-    0 18px 40px -16px rgba(31, 34, 48, 0.42),
-    0 0 0 1px rgba(240, 200, 69, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px -16px rgba(31, 34, 48, 0.42);
   overflow: hidden;
   transform: perspective(1000px) rotateX(1.5deg) rotateY(-1.5deg);
   transition: transform 0.3s ease;
@@ -446,7 +554,6 @@ onMounted(() => {
   align-items: center;
   padding: 12px 16px;
   background: rgba(41, 44, 59, 0.92);
-  border-bottom: 1px solid rgba(240, 200, 69, 0.08);
 }
 
 .terminal-buttons {
@@ -584,11 +691,10 @@ onMounted(() => {
 }
 
 /* Dark mode adjustments */
-:deep(.dark) .terminal-window {
+:global(html.dark .terminal-window) {
   box-shadow:
     0 18px 40px -16px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(240, 200, 69, 0.18),
-    0 0 24px rgba(240, 200, 69, 0.08),
+    inset 0 0 0 1px rgba(254, 254, 253, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 </style>

@@ -49,7 +49,7 @@
       <div class="max-w-xl mx-auto mb-14">
         <div class="flex gap-3">
           <div class="flex-1 relative">
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500">
+            <div class="key-inline-icon absolute left-4 top-1/2 -translate-y-1/2">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
@@ -58,12 +58,12 @@
               v-model="apiKey"
               :type="keyVisible ? 'text' : 'password'"
               :placeholder="t('keyUsage.placeholder')"
-              class="input-ring h-12 w-full rounded-lg border border-gray-200 bg-white pl-12 pr-12 text-sm text-gray-900 placeholder:text-gray-400 transition-all dark:border-dark-700 dark:bg-[#292C3B] dark:text-white dark:placeholder:text-dark-500"
+              class="key-glass-input input-ring h-12 w-full rounded-md pl-12 pr-12 text-sm text-gray-900 placeholder:text-gray-400 transition-all dark:text-white dark:placeholder:text-dark-500"
               @keydown.enter="queryKey"
             />
             <button
               @click="keyVisible = !keyVisible"
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:text-dark-500 dark:hover:text-white transition-colors"
+              class="key-icon-button absolute right-4 top-1/2 -translate-y-1/2"
             >
               <svg v-if="!keyVisible" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
@@ -101,22 +101,22 @@
               v-for="range in dateRanges"
               :key="range.key"
               @click="setDateRange(range.key)"
-              class="text-xs px-3 py-1.5 rounded-lg border transition-all"
+              class="key-option-button text-xs px-3 py-1.5"
               :class="currentRange === range.key
-                ? 'border-[#DDA931] bg-[#F0C845] text-[#292C3B]'
-                : 'border-gray-200 bg-white text-gray-700 dark:border-dark-700 dark:bg-dark-900 dark:text-dark-200 hover:border-primary-300 dark:hover:border-dark-600'"
+                ? 'key-option-button-selected'
+                : 'key-option-button-idle'"
             >{{ range.label }}</button>
             <div v-if="currentRange === 'custom'" class="flex items-center gap-2 ml-1">
               <input
                 v-model="customStartDate"
                 type="date"
-                class="input-ring text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 dark:border-dark-700 dark:bg-dark-900 dark:text-white"
+                class="key-date-input input-ring text-xs px-2 py-1.5"
               />
               <span class="text-xs text-gray-400">-</span>
               <input
                 v-model="customEndDate"
                 type="date"
-                class="input-ring text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 dark:border-dark-700 dark:bg-dark-900 dark:text-white"
+                class="key-date-input input-ring text-xs px-2 py-1.5"
               />
               <button
                 @click="queryKey"
@@ -132,16 +132,16 @@
         <!-- Loading Skeleton -->
         <div v-if="showLoading" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-dark-700 dark:bg-[#292C3B]">
+            <div class="key-panel rounded-md p-8">
               <div class="skeleton h-5 w-24 mb-6"></div>
               <div class="flex justify-center"><div class="skeleton w-44 h-44 rounded-full"></div></div>
             </div>
-            <div class="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-dark-700 dark:bg-[#292C3B]">
+            <div class="key-panel rounded-md p-8">
               <div class="skeleton h-5 w-24 mb-6"></div>
               <div class="flex justify-center"><div class="skeleton w-44 h-44 rounded-full"></div></div>
             </div>
           </div>
-          <div class="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-dark-700 dark:bg-[#292C3B]">
+          <div class="key-panel rounded-md p-8">
             <div class="skeleton h-5 w-32 mb-6"></div>
             <div class="space-y-4">
               <div class="skeleton h-4 w-full"></div>
@@ -156,10 +156,10 @@
         <div v-else-if="resultData" class="space-y-6">
           <!-- Status Badge -->
           <div v-if="statusInfo" class="fade-up flex items-center justify-center mb-2">
-            <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white/90 shadow-sm backdrop-blur-sm dark:border-dark-700 dark:bg-dark-900/90">
+            <div class="key-glass-pill inline-flex items-center gap-2 px-5 py-2.5">
               <span
                 class="w-2.5 h-2.5 rounded-full pulse-dot"
-                :class="statusInfo.isActive ? 'bg-[#DDA931]' : 'bg-rose-500'"
+                :class="statusInfo.isActive ? 'bg-[#DDA931]' : 'bg-[#3B4256] dark:bg-[#FEFEFD]/50'"
               ></span>
               <span class="text-sm font-medium text-gray-900 dark:text-white">{{ statusInfo.label }}</span>
               <span class="text-xs text-gray-400 dark:text-dark-500">|</span>
@@ -172,7 +172,7 @@
             <div
               v-for="(ring, i) in ringItems"
               :key="i"
-              class="fade-up rounded-lg border border-gray-200 bg-white/90 p-8 backdrop-blur-sm transition-all duration-300 hover:shadow-sm dark:border-dark-700 dark:bg-[#292C3B]/90"
+              class="key-panel fade-up rounded-md p-8 transition-all duration-300"
               :class="`fade-up-delay-${Math.min(i + 1, 4)}`"
             >
               <div class="flex items-center justify-between mb-6">
@@ -180,15 +180,15 @@
                   {{ ring.title }}
                 </h3>
                 <!-- Clock icon -->
-                <svg v-if="ring.iconType === 'clock'" class="w-5 h-5 text-gray-400 dark:text-dark-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg v-if="ring.iconType === 'clock'" class="key-ring-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
                 <!-- Calendar icon -->
-                <svg v-else-if="ring.iconType === 'calendar'" class="w-5 h-5 text-gray-400 dark:text-dark-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg v-else-if="ring.iconType === 'calendar'" class="key-ring-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
                 <!-- Dollar icon -->
-                <svg v-else class="w-5 h-5 text-gray-400 dark:text-dark-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg v-else class="key-ring-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                 </svg>
               </div>
@@ -206,14 +206,14 @@
                     />
                     <defs>
                       <linearGradient :id="`ring-grad-${i}`" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" :stop-color="RING_GRADIENTS[i % 4].from"/>
-                        <stop offset="100%" :stop-color="RING_GRADIENTS[i % 4].to"/>
+                        <stop offset="0%" :stop-color="RING_GRADIENTS[i % RING_GRADIENTS.length].from"/>
+                        <stop offset="100%" :stop-color="RING_GRADIENTS[i % RING_GRADIENTS.length].to"/>
                       </linearGradient>
                     </defs>
                   </svg>
                   <div class="absolute inset-0 flex flex-col items-center justify-center">
                     <template v-if="ring.isBalance">
-                      <span class="text-2xl font-bold tabular-nums" :style="{ color: RING_GRADIENTS[i % 4].from }">
+                      <span class="text-2xl font-bold tabular-nums" :style="{ color: RING_GRADIENTS[i % RING_GRADIENTS.length].from }">
                         {{ ring.amount }}
                       </span>
                     </template>
@@ -224,7 +224,7 @@
                       <span class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">{{ t('keyUsage.used') }}</span>
                       <span
                         class="text-sm font-semibold mt-1 tabular-nums"
-                        :style="{ color: RING_GRADIENTS[i % 4].from }"
+                        :style="{ color: RING_GRADIENTS[i % RING_GRADIENTS.length].from }"
                       >{{ ring.amount }}</span>
                       <p v-if="ring.resetAt && formatResetTime(ring.resetAt)" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 tabular-nums">
                         ⟳ {{ formatResetTime(ring.resetAt) }}
@@ -239,21 +239,21 @@
           <!-- Detail Card -->
           <div
             v-if="detailRows.length > 0"
-            class="fade-up fade-up-delay-3 overflow-hidden rounded-lg border border-gray-200 bg-white/90 backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/90"
+            class="key-panel fade-up fade-up-delay-3 overflow-hidden rounded-md"
           >
-            <div class="px-8 py-5 border-b border-gray-200 dark:border-dark-700">
+            <div class="px-8 py-5">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.detailInfo') }}</h3>
             </div>
-            <div class="divide-y divide-gray-100 dark:divide-dark-800">
+            <div class="key-detail-list space-y-1 px-2 pb-2">
               <div
                 v-for="(row, i) in detailRows"
                 :key="i"
-                class="px-8 py-4 flex items-center justify-between"
+                class="key-detail-row rounded-md px-6 py-3.5 flex items-center justify-between"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg flex items-center justify-center" :class="row.iconBg">
+                  <div class="key-detail-icon w-8 h-8 rounded-lg flex items-center justify-center" :class="row.iconBg">
                     <svg
-                      class="w-4 h-4"
+                      class="key-detail-icon-svg w-4 h-4"
                       :class="row.iconColor"
                       viewBox="0 0 24 24" fill="none" stroke="currentColor"
                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -272,16 +272,16 @@
           <!-- Usage Stats Card -->
           <div
             v-if="usageStatCells.length > 0"
-            class="fade-up fade-up-delay-3 overflow-hidden rounded-lg border border-gray-200 bg-white/90 backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/90"
+            class="key-panel fade-up fade-up-delay-3 overflow-hidden rounded-md"
           >
-            <div class="px-8 py-5 border-b border-gray-200 dark:border-dark-700">
+            <div class="px-8 py-5">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.tokenStats') }}</h3>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-100 dark:bg-dark-800">
+            <div class="key-stat-grid grid grid-cols-2 gap-2 p-2 md:grid-cols-4">
               <div
                 v-for="(cell, i) in usageStatCells"
                 :key="i"
-                class="bg-white px-6 py-4 dark:bg-dark-900"
+                class="key-stat-cell rounded-md px-5 py-4"
               >
                 <div class="text-xs text-gray-500 dark:text-dark-400 mb-1">{{ cell.label }}</div>
                 <div class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">{{ cell.value }}</div>
@@ -292,19 +292,19 @@
           <!-- Daily Usage Table -->
           <div
             v-if="showDailyUsage"
-            class="fade-up fade-up-delay-4 overflow-hidden rounded-lg border border-gray-200 bg-white/90 backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/90"
+            class="key-panel key-table-panel fade-up fade-up-delay-4 overflow-hidden rounded-md"
           >
-            <div class="flex flex-col gap-3 px-8 py-5 border-b border-gray-200 dark:border-dark-700 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-3 px-8 py-5 sm:flex-row sm:items-center sm:justify-between">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.dailyDetail') }}</h3>
-              <div class="inline-flex rounded-lg border border-gray-200 bg-white p-0.5 dark:border-dark-700 dark:bg-dark-950">
+              <div class="key-segmented inline-flex rounded-md p-0.5">
                 <button
                   v-for="option in dailyUsageOptions"
                   :key="option.value"
                   @click="setDailyUsageDays(option.value)"
-                class="min-w-12 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+                  class="key-option-button min-w-12 px-3 py-1.5 text-xs font-medium"
                   :class="dailyUsageDays === option.value
-                    ? 'bg-[#F0C845] text-[#292C3B]'
-                    : 'text-gray-600 hover:bg-gray-100 dark:text-dark-300 dark:hover:bg-dark-800'"
+                    ? 'key-option-button-selected'
+                    : 'key-option-button-idle'"
                 >
                   {{ option.label }}
                 </button>
@@ -313,7 +313,7 @@
             <div v-if="dailyUsageRows.length > 0" class="overflow-x-auto">
               <table class="w-full">
                 <thead>
-                  <tr class="border-b border-gray-200 bg-gray-50 dark:border-dark-700 dark:bg-dark-950">
+                  <tr class="key-table-head">
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.date') }}</th>
                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.requests') }}</th>
                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.inputTokens') }}</th>
@@ -327,7 +327,7 @@
                   <tr
                     v-for="row in dailyUsageRows"
                     :key="row.date"
-                    class="border-b border-gray-100 last:border-b-0 dark:border-dark-800"
+                    class="key-table-row"
                   >
                     <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">{{ row.date }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 dark:text-dark-200">{{ fmtNum(row.requests) }}</td>
@@ -348,15 +348,15 @@
           <!-- Model Stats Table -->
           <div
             v-if="modelStats.length > 0"
-            class="fade-up fade-up-delay-4 overflow-hidden rounded-lg border border-gray-200 bg-white/90 backdrop-blur-sm dark:border-dark-700 dark:bg-[#292C3B]/90"
+            class="key-panel key-table-panel fade-up fade-up-delay-4 overflow-hidden rounded-md"
           >
-            <div class="px-8 py-5 border-b border-gray-200 dark:border-dark-700">
+            <div class="px-8 py-5">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.modelStats') }}</h3>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full">
                 <thead>
-                  <tr class="border-b border-gray-200 bg-gray-50 dark:border-dark-700 dark:bg-dark-950">
+                  <tr class="key-table-head">
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.model') }}</th>
                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.requests') }}</th>
                     <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-dark-400">{{ t('keyUsage.inputTokens') }}</th>
@@ -371,7 +371,7 @@
                   <tr
                     v-for="(m, i) in modelStats"
                     :key="i"
-                    class="border-b border-gray-100 last:border-b-0 dark:border-dark-800"
+                    class="key-table-row"
                   >
                     <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">{{ m.model || '-' }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 dark:text-dark-200">{{ fmtNum(m.requests) }}</td>
@@ -391,7 +391,7 @@
     </main>
 
     <!-- Footer (same pattern as HomeView) -->
-    <footer class="relative z-10 border-t border-gray-200/50 px-6 py-8 dark:border-dark-800/50">
+    <footer class="relative z-10 px-6 py-8">
       <div class="mx-auto flex max-w-6xl flex-col items-center justify-center gap-4 text-center sm:flex-row sm:text-left">
         <p class="text-sm text-gray-500 dark:text-dark-400">
           &copy; {{ currentYear }} {{ siteName }}. {{ t('home.footer.allRightsReserved') }}
@@ -527,9 +527,7 @@ function setDailyUsageDays(days: 7 | 30 | 90) {
 const CIRCUMFERENCE = 2 * Math.PI * 68
 const RING_GRADIENTS = [
   { from: '#F0C845', to: '#DDA931' },
-  { from: '#DDA931', to: '#C08D27' },
-  { from: '#292C3B', to: '#4D566D' },
-  { from: '#F0C845', to: '#292C3B' },
+  { from: '#DDA931', to: '#F0C845' },
 ]
 
 const ringAnimated = ref(false)
@@ -676,6 +674,12 @@ function getUsageColor(pct: number): string {
   return 'text-[#292C3B] dark:text-[#FEFEFD]'
 }
 
+function getRemainingColor(value: number, warningThreshold: number): string {
+  if (value <= 0) return 'text-rose-500'
+  if (value < warningThreshold) return 'text-[#DDA931] dark:text-[#F0C845]'
+  return 'text-[#292C3B] dark:text-[#FEFEFD]'
+}
+
 const detailRows = computed<DetailRow[]>(() => {
   const data = resultData.value
   if (!data) return []
@@ -688,11 +692,9 @@ const detailRows = computed<DetailRow[]>(() => {
 
   if (data.mode === 'quota_limited') {
     if (data.quota) {
-      const remainColor = data.quota.remaining <= 0 ? 'text-rose-500'
-        : data.quota.remaining < data.quota.limit * 0.1 ? 'text-amber-500'
-        : 'text-emerald-500'
+      const remainColor = getRemainingColor(data.quota.remaining, data.quota.limit * 0.1)
       rows.push({
-        iconBg: 'bg-[#F0C845]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_SHIELD,
+        iconBg: '', iconColor: '', iconSvg: ICON_SHIELD,
         label: t('keyUsage.remainingQuota'), value: usd(data.quota.remaining), valueClass: remainColor,
       })
     }
@@ -703,7 +705,7 @@ const detailRows = computed<DetailRow[]>(() => {
         expiryStr += daysLeft > 0 ? ` ${t('keyUsage.daysLeft', { days: daysLeft })}` : daysLeft === 0 ? ` ${t('keyUsage.todayExpires')}` : ''
       }
       rows.push({
-        iconBg: 'bg-[#DDA931]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_CALENDAR,
+        iconBg: '', iconColor: '', iconSvg: ICON_CALENDAR,
         label: t('keyUsage.expiresAt'), value: expiryStr, valueClass: '',
       })
     }
@@ -717,7 +719,7 @@ const detailRows = computed<DetailRow[]>(() => {
           valueStr += ` (⟳ ${resetStr})`
         }
         rows.push({
-          iconBg: 'bg-[#F0C845]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_DOLLAR,
+          iconBg: '', iconColor: '', iconSvg: ICON_DOLLAR,
           label: `${t('keyUsage.usedQuota')} (${windowMap[rl.window] || rl.window})`,
           value: valueStr,
           valueClass: getUsageColor(pct),
@@ -726,7 +728,7 @@ const detailRows = computed<DetailRow[]>(() => {
     }
   } else {
     rows.push({
-      iconBg: 'bg-[#F0C845]/10', iconColor: 'text-[#292C3B] dark:text-[#FEFEFD]', iconSvg: ICON_CHECK,
+      iconBg: '', iconColor: '', iconSvg: ICON_CHECK,
       label: t('keyUsage.subscriptionType'), value: data.planName || t('keyUsage.walletBalance'), valueClass: '',
     })
 
@@ -735,37 +737,37 @@ const detailRows = computed<DetailRow[]>(() => {
       if (sub.daily_limit_usd > 0) {
         const pct = (sub.daily_usage_usd / sub.daily_limit_usd) * 100
         rows.push({
-          iconBg: 'bg-[#F0C845]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_DOLLAR,
+          iconBg: '', iconColor: '', iconSvg: ICON_DOLLAR,
           label: `${t('keyUsage.usedQuota')} (${locale.value === 'zh' ? '日' : 'D'})`, value: `${usd(sub.daily_usage_usd)} / ${usd(sub.daily_limit_usd)}`, valueClass: getUsageColor(pct),
         })
       }
       if (sub.weekly_limit_usd > 0) {
         const pct = (sub.weekly_usage_usd / sub.weekly_limit_usd) * 100
         rows.push({
-          iconBg: 'bg-[#292C3B]/10', iconColor: 'text-[#292C3B] dark:text-[#FEFEFD]', iconSvg: ICON_DOLLAR,
+          iconBg: '', iconColor: '', iconSvg: ICON_DOLLAR,
           label: `${t('keyUsage.usedQuota')} (${locale.value === 'zh' ? '周' : 'W'})`, value: `${usd(sub.weekly_usage_usd)} / ${usd(sub.weekly_limit_usd)}`, valueClass: getUsageColor(pct),
         })
       }
       if (sub.monthly_limit_usd > 0) {
         const pct = (sub.monthly_usage_usd / sub.monthly_limit_usd) * 100
         rows.push({
-          iconBg: 'bg-[#DDA931]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_DOLLAR,
+          iconBg: '', iconColor: '', iconSvg: ICON_DOLLAR,
           label: `${t('keyUsage.usedQuota')} (${locale.value === 'zh' ? '月' : 'M'})`, value: `${usd(sub.monthly_usage_usd)} / ${usd(sub.monthly_limit_usd)}`, valueClass: getUsageColor(pct),
         })
       }
       if (sub.expires_at) {
         rows.push({
-          iconBg: 'bg-[#DDA931]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_CALENDAR,
+          iconBg: '', iconColor: '', iconSvg: ICON_CALENDAR,
           label: t('keyUsage.subscriptionExpires'), value: formatDate(sub.expires_at), valueClass: '',
         })
       }
     }
 
     const remainColor = data.remaining != null
-      ? (data.remaining <= 0 ? 'text-rose-500' : data.remaining < 10 ? 'text-amber-500' : 'text-emerald-500')
+      ? getRemainingColor(data.remaining, 10)
       : ''
     rows.push({
-      iconBg: 'bg-[#F0C845]/10', iconColor: 'text-[#DDA931] dark:text-[#F0C845]', iconSvg: ICON_SHIELD,
+      iconBg: '', iconColor: '', iconSvg: ICON_SHIELD,
       label: t('keyUsage.remainingQuota'), value: data.remaining != null ? usd(data.remaining) : '-', valueClass: remainColor,
     })
   }
@@ -939,6 +941,218 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.key-inline-icon,
+.key-icon-button,
+.key-ring-icon {
+  color: #dda931;
+}
+
+.key-icon-button {
+  transition: color 0.2s ease;
+}
+
+.key-icon-button:hover {
+  color: #292c3b;
+}
+
+:global(html.dark .key-inline-icon),
+:global(html.dark .key-icon-button),
+:global(html.dark .key-ring-icon) {
+  color: #f0c845;
+}
+
+:global(html.dark .key-icon-button:hover) {
+  color: #fefefd;
+}
+
+.key-option-button {
+  border-radius: 7px;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.key-option-button-selected {
+  color: #292c3b;
+  background: #f0c845;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+.key-option-button-idle {
+  color: rgba(41, 44, 59, 0.72);
+  background: rgba(254, 254, 253, 0.5);
+}
+
+.key-option-button-idle:hover {
+  color: #292c3b;
+  background: rgba(240, 200, 69, 0.16);
+}
+
+.key-date-input {
+  border-radius: 7px;
+  color: #292c3b;
+  background: #fefefd;
+  box-shadow: 0 1px 2px rgba(31, 34, 48, 0.04);
+}
+
+.key-segmented {
+  background: rgba(41, 44, 59, 0.06);
+}
+
+.key-detail-icon {
+  color: #292c3b;
+  background: rgba(240, 200, 69, 0.16);
+}
+
+.key-detail-icon-svg {
+  color: currentColor;
+}
+
+:global(html.dark .key-option-button-selected) {
+  color: #292c3b;
+  background: #f0c845;
+}
+
+:global(html.dark .key-option-button-idle) {
+  color: rgba(254, 254, 253, 0.68);
+  background: rgba(254, 254, 253, 0.06);
+}
+
+:global(html.dark .key-option-button-idle:hover) {
+  color: #fefefd;
+  background: rgba(240, 200, 69, 0.12);
+}
+
+:global(html.dark .key-date-input) {
+  color: #fefefd;
+  background: #1f2230;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+:global(html.dark .key-segmented) {
+  background: rgba(254, 254, 253, 0.06);
+}
+
+:global(html.dark .key-detail-icon) {
+  color: #f0c845;
+  background: rgba(240, 200, 69, 0.12);
+}
+
+.key-panel,
+.key-glass-card {
+  position: relative;
+  overflow: hidden;
+  background: #fefefd;
+  box-shadow: 0 4px 12px rgba(31, 34, 48, 0.045);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.key-panel:hover,
+.key-glass-card:hover {
+  box-shadow: 0 8px 18px rgba(31, 34, 48, 0.07);
+}
+
+.key-glass-input {
+  background: #fefefd;
+  box-shadow: 0 2px 6px rgba(31, 34, 48, 0.04);
+}
+
+.key-glass-pill {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #fefefd;
+  box-shadow: 0 2px 8px rgba(31, 34, 48, 0.05);
+}
+
+.key-detail-row {
+  background: rgba(41, 44, 59, 0.035);
+}
+
+.key-detail-row:hover {
+  background: rgba(240, 200, 69, 0.08);
+}
+
+.key-stat-grid {
+  background: transparent;
+}
+
+.key-stat-cell {
+  background: rgba(41, 44, 59, 0.035);
+}
+
+.key-table-head {
+  background: #f8f7f2;
+}
+
+.key-table-row {
+  background: #fefefd;
+  transition: background-color 0.15s ease;
+}
+
+.key-table-row > td {
+  background: #fefefd;
+}
+
+.key-table-row:last-child {
+  border-bottom: 0;
+}
+
+.key-table-row:hover,
+.key-table-row:hover > td {
+  background: #fbf3d4;
+}
+
+:global(html.dark .key-panel),
+:global(html.dark .key-glass-card) {
+  background: #292c3b;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
+}
+
+:global(html.dark .key-panel:hover),
+:global(html.dark .key-glass-card:hover) {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+:global(html.dark .key-glass-pill),
+:global(html.dark .key-glass-input) {
+  background: #292c3b;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+}
+
+:global(html.dark .key-detail-row) {
+  background: rgba(254, 254, 253, 0.045);
+}
+
+:global(html.dark .key-detail-row:hover) {
+  background: rgba(240, 200, 69, 0.1);
+}
+
+:global(html.dark .key-stat-grid) {
+  background: transparent;
+}
+
+:global(html.dark .key-stat-cell) {
+  background: rgba(254, 254, 253, 0.045);
+}
+
+:global(html.dark .key-table-head) {
+  background: #1f2230;
+}
+
+:global(html.dark .key-table-row),
+:global(html.dark .key-table-row > td) {
+  background: #292c3b;
+}
+
+:global(html.dark .key-table-row:hover),
+:global(html.dark .key-table-row:hover > td) {
+  background: #373745;
+}
+
 /* Input focus ring */
 .input-ring {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
@@ -967,7 +1181,7 @@ onUnmounted(() => {
   animation: shimmer-kv 1.8s ease-in-out infinite;
   border-radius: 8px;
 }
-:global(.dark) .skeleton {
+:global(html.dark .skeleton) {
   background: linear-gradient(90deg, #334155 25%, #1e293b 50%, #334155 75%);
   background-size: 200% 100%;
 }

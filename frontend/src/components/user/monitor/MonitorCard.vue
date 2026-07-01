@@ -1,13 +1,13 @@
 <template>
   <button
     type="button"
-    class="group text-left p-5 rounded-2xl min-h-[280px] w-full bg-white/70 backdrop-blur-xl border border-gray-200/80 shadow-card dark:bg-dark-800/60 dark:border-dark-700/70 hover:-translate-y-1 hover:shadow-card-hover dark:hover:border-primary-500/30 hover:border-gray-300 transition-all duration-300 ease-out flex flex-col"
+    class="glass-card card-hover group flex min-h-[280px] w-full flex-col p-5 text-left"
     @click="emit('click')"
   >
     <!-- Header: icon + name/model + status chip -->
     <div class="flex items-start gap-3">
       <span
-        class="w-9 h-9 rounded-xl ring-1 ring-black/5 dark:ring-white/10 grid place-items-center flex-shrink-0"
+        class="w-9 h-9 rounded-lg grid place-items-center flex-shrink-0"
         :class="[providerGradient(item.provider), providerTintClass]"
       >
         <ProviderIcon :provider="item.provider" :size="20" />
@@ -55,7 +55,7 @@
     />
 
     <!-- Divider -->
-    <div class="mt-4 border-t border-gray-100 dark:border-dark-700/60"></div>
+    <div class="mt-4 h-px bg-gray-100/70 dark:bg-dark-700/50"></div>
 
     <!-- Availability row -->
     <MonitorAvailabilityRow
@@ -86,9 +86,9 @@ import MonitorAvailabilityRow from './MonitorAvailabilityRow.vue'
 import MonitorTimeline from './MonitorTimeline.vue'
 
 const PROVIDER_TINT: Record<string, string> = {
-  openai: 'text-emerald-600 dark:text-emerald-300',
-  anthropic: 'text-orange-600 dark:text-orange-300',
-  gemini: 'text-sky-600 dark:text-sky-300',
+  openai: 'text-[#DDA931] dark:text-[#F0C845]',
+  anthropic: 'text-[#DDA931] dark:text-[#F0C845]',
+  gemini: 'text-[#DDA931] dark:text-[#F0C845]',
 }
 
 const props = defineProps<{
@@ -112,7 +112,7 @@ const {
 } = useChannelMonitorFormat()
 
 const providerTintClass = computed(() =>
-  PROVIDER_TINT[props.item.provider] ?? 'text-gray-500 dark:text-gray-300'
+  PROVIDER_TINT[props.item.provider] ?? 'text-[#DDA931] dark:text-[#F0C845]'
 )
 
 const availabilityLabel = computed(() => {

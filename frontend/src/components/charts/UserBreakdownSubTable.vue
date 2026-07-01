@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50/50 dark:bg-dark-700/30">
+  <div class="bg-[#F8F7F2] dark:bg-[#1F2230]">
     <div v-if="loading" class="flex items-center justify-center py-3">
       <LoadingSpinner />
     </div>
@@ -11,7 +11,7 @@
         <tr
           v-for="user in items"
           :key="user.user_id"
-          class="border-t border-gray-100/50 dark:border-gray-700/50"
+          class="transition-colors hover:bg-[#FBF3D4] dark:hover:bg-[#373745]"
         >
           <td class="max-w-[120px] truncate py-1 pl-6 text-gray-600 dark:text-gray-300" :title="user.email">
             {{ user.email || `User #${user.user_id}` }}
@@ -22,10 +22,10 @@
           <td class="py-1 text-right text-gray-500 dark:text-gray-400">
             {{ formatTokens(user.total_tokens) }}
           </td>
-          <td class="py-1 text-right text-green-600 dark:text-green-400">
+          <td class="dashboard-accent-text py-1 text-right">
             ${{ formatCost(user.actual_cost) }}
           </td>
-          <td v-if="showAccountCost" class="py-1 text-right text-orange-500 dark:text-orange-400">
+          <td v-if="showAccountCost" class="dashboard-account-text py-1 text-right">
             ${{ formatCost(user.account_cost) }}
           </td>
           <td class="py-1 pr-1 text-right text-gray-400 dark:text-gray-500">

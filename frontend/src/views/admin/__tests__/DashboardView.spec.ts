@@ -112,7 +112,7 @@ describe('admin DashboardView', () => {
     })
   })
 
-  it('uses last 24 hours as default dashboard range', async () => {
+  it('uses last 45 days as default dashboard range', async () => {
     mount(DashboardView, {
       global: {
         stubs: {
@@ -131,13 +131,14 @@ describe('admin DashboardView', () => {
     await flushPromises()
 
     const now = new Date()
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    const rangeStart = new Date(now)
+    rangeStart.setDate(rangeStart.getDate() - 45)
 
     expect(getSnapshotV2).toHaveBeenCalledTimes(1)
     expect(getSnapshotV2).toHaveBeenCalledWith(expect.objectContaining({
-      start_date: formatLocalDate(yesterday),
+      start_date: formatLocalDate(rangeStart),
       end_date: formatLocalDate(now),
-      granularity: 'hour'
+      granularity: 'day'
     }))
   })
 })

@@ -1,13 +1,13 @@
 <template>
   <div v-if="!isDesktopViewport" class="space-y-3">
     <template v-if="loading">
-      <div v-for="i in 5" :key="i" class="rounded-lg border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-900">
+      <div v-for="i in 5" :key="i" class="glass-card p-4">
         <div class="space-y-3">
           <div v-for="column in dataColumns" :key="column.key" class="flex justify-between">
             <div class="h-4 w-20 animate-pulse rounded bg-gray-200 dark:bg-dark-700"></div>
             <div class="h-4 w-32 animate-pulse rounded bg-gray-200 dark:bg-dark-700"></div>
           </div>
-          <div v-if="hasActionsColumn" class="border-t border-gray-200 pt-3 dark:border-dark-700">
+          <div v-if="hasActionsColumn" class="rounded-md bg-gray-50 p-3 dark:bg-dark-900/60">
             <div class="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-dark-700"></div>
           </div>
         </div>
@@ -15,7 +15,7 @@
     </template>
 
     <template v-else-if="!data || data.length === 0">
-      <div class="rounded-lg border border-gray-200 bg-white p-12 text-center dark:border-dark-700 dark:bg-dark-900">
+      <div class="glass-card p-12 text-center">
         <slot name="empty">
           <div class="flex flex-col items-center">
             <Icon
@@ -35,7 +35,7 @@
       <div
         v-for="(row, index) in sortedData"
         :key="resolveRowKey(row, index)"
-        class="rounded-lg border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-900"
+        class="glass-card p-4"
       >
         <div class="space-y-3">
           <div
@@ -52,7 +52,7 @@
               </slot>
             </div>
           </div>
-          <div v-if="hasActionsColumn" class="border-t border-gray-200 pt-3 dark:border-dark-700">
+          <div v-if="hasActionsColumn" class="rounded-md bg-gray-50 p-3 dark:bg-dark-900/60">
             <slot name="cell-actions" :row="row" :value="row['actions']" :expanded="actionsExpanded"></slot>
           </div>
         </div>
@@ -69,8 +69,8 @@
       'is-scrollable': isScrollable
     }"
   >
-    <table class="w-full min-w-max divide-y divide-gray-200 dark:divide-dark-700">
-      <thead class="table-header bg-gray-50 dark:bg-dark-800">
+    <table class="w-full min-w-max">
+      <thead class="table-header">
         <tr>
           <th
             v-for="(column, index) in columns"
@@ -80,7 +80,7 @@
             :class="[
               'sticky-header-cell py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-dark-400',
               getAdaptivePaddingClass(),
-              { 'cursor-pointer hover:bg-gray-100 dark:hover:bg-dark-700': column.sortable },
+              getSortableHeaderClass(column),
               getStickyColumnClass(column, index),
               column.class
             ]"
@@ -121,7 +121,7 @@
           </th>
         </tr>
       </thead>
-      <tbody class="table-body divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-900">
+      <tbody class="table-body">
         <!-- Loading skeleton -->
         <tr v-if="loading" v-for="i in 5" :key="i">
           <td v-for="column in columns" :key="column.key" :class="['whitespace-nowrap py-4', getAdaptivePaddingClass()]">
@@ -165,7 +165,7 @@
             :data-row-id="resolveRowKey(sortedData[virtualRow.index], virtualRow.index)"
             :data-index="virtualRow.index"
             :ref="measureElement"
-            class="hover:bg-gray-50 dark:hover:bg-dark-800"
+            class="data-table-row"
           >
             <td
               v-for="(column, colIndex) in columns"
@@ -469,8 +469,15 @@ const applySortState = (state: PersistedSortState | null) => {
 
 const getSortIndicatorClass = (key: string, order: 'asc' | 'desc') => {
   return sortKey.value === key && sortOrder.value === order
-    ? 'text-primary-600 dark:text-primary-400'
+    ? 'text-[#DDA931] dark:text-[#F0C845]'
     : 'text-gray-300 transition-colors dark:text-dark-500'
+}
+
+const getSortableHeaderClass = (column: Column) => {
+  if (!column.sortable) return ''
+  return sortKey.value === column.key
+    ? 'data-table-sortable-header data-table-sort-active'
+    : 'data-table-sortable-header'
 }
 
 const getColumnAriaSort = (key: string) => {
@@ -753,8 +760,14 @@ defineExpose({
   overflow-x: auto;
   overflow-y: auto;
   flex: 1;
+  height: 100%;
   min-height: 0;
   isolation: isolate;
+  background: #fefefd;
+}
+
+:global(.dark) .table-wrapper {
+  background: #292c3b;
 }
 
 /* 表头容器，确保在滚动时覆盖表体内容 */
@@ -762,17 +775,34 @@ defineExpose({
   position: sticky;
   top: 0;
   z-index: 200;
-  background-color: rgb(249 250 251);
+  background: #f8f7f2;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.dark .table-wrapper .table-header {
-  background-color: rgb(31 41 55);
+:global(.dark) .table-wrapper .table-header {
+  background: #1f2230;
 }
 
 /* 表体保持在表头下方 */
 .table-body {
   position: relative;
   z-index: 0;
+  background: #fefefd;
+}
+
+:global(.dark) .table-body {
+  background: #292c3b;
+}
+
+.table-body td {
+  border-bottom: 1px solid transparent;
+  background: #fefefd;
+}
+
+:global(.dark) .table-body td {
+  border-bottom-color: transparent;
+  background: #292c3b;
 }
 
 /* 所有表头单元格固定在顶部 */
@@ -780,11 +810,34 @@ defineExpose({
   position: sticky;
   top: 0;
   z-index: 210; /* 必须高于所有表体内容 */
-  background-color: rgb(249 250 251);
+  background: #f8f7f2;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.dark .sticky-header-cell {
-  background-color: rgb(31 41 55);
+.data-table-sortable-header {
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.data-table-sortable-header:hover,
+.data-table-sort-active {
+  color: #292c3b;
+  background: #f0c845;
+}
+
+:global(.dark) .data-table-sortable-header:hover,
+:global(.dark) .data-table-sort-active {
+  color: #292c3b;
+  background: #f0c845;
+}
+
+:global(.dark) .sticky-header-cell {
+  background: #1f2230;
+  border-bottom-color: transparent;
 }
 
 /* Sticky 列基础样式 */
@@ -820,20 +873,41 @@ defineExpose({
 
 /* 表体 sticky 列背景 */
 tbody .sticky-col {
-  background-color: white;
+  background: #fefefd;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.dark tbody .sticky-col {
-  background-color: rgb(17 24 39);
+:global(.dark) .table-wrapper tbody .sticky-col {
+  background: #292c3b;
 }
 
 /* hover 状态保持 */
 tbody tr:hover .sticky-col {
-  background-color: rgb(249 250 251);
+  background: #fbf3d4;
 }
 
-.dark tbody tr:hover .sticky-col {
-  background-color: rgb(31 41 55);
+:global(.dark) .table-wrapper tbody tr:hover .sticky-col {
+  background: #373745;
+}
+
+.data-table-row {
+  background: #fefefd;
+  transition: background-color 0.15s ease;
+}
+
+.data-table-row:hover,
+.data-table-row:hover > td {
+  background: #fbf3d4;
+}
+
+:global(.dark) .data-table-row {
+  background: #292c3b;
+}
+
+:global(.dark) .data-table-row:hover,
+:global(.dark) .data-table-row:hover > td {
+  background: #373745;
 }
 
 /* 阴影只在可滚动时显示 */
@@ -846,7 +920,7 @@ tbody tr:hover .sticky-col {
   bottom: 0;
   width: 10px;
   transform: translateX(100%);
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.04), transparent);
   pointer-events: none;
 }
 
@@ -859,7 +933,7 @@ tbody tr:hover .sticky-col {
   bottom: 0;
   width: 10px;
   transform: translateX(100%);
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.04), transparent);
   pointer-events: none;
 }
 
@@ -872,18 +946,18 @@ tbody tr:hover .sticky-col {
   bottom: 0;
   width: 10px;
   transform: translateX(-100%);
-  background: linear-gradient(to left, rgba(0, 0, 0, 0.08), transparent);
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.04), transparent);
   pointer-events: none;
 }
 
 /* 暗色模式阴影 */
-.dark .is-scrollable .sticky-col-left::after,
-.dark .is-scrollable .sticky-col-left-second::after {
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
+:global(.dark) .is-scrollable .sticky-col-left::after,
+:global(.dark) .is-scrollable .sticky-col-left-second::after {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.12), transparent);
 }
 
-.dark .is-scrollable .sticky-col-right::before {
-  background: linear-gradient(to left, rgba(0, 0, 0, 0.2), transparent);
+:global(.dark) .is-scrollable .sticky-col-right::before {
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.12), transparent);
 }
 </style>
 

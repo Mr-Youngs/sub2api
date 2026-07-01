@@ -6,7 +6,7 @@
     </label>
     <div
       v-if="isSearchable"
-      class="flex items-center gap-2 rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 px-3 py-2 dark:border-dark-600 dark:bg-dark-800"
+      class="flex items-center gap-2 rounded-t-md border border-b-0 border-transparent bg-gray-50 px-3 py-2 dark:bg-dark-800"
     >
       <Icon name="search" size="sm" class="shrink-0 text-gray-400" />
       <input
@@ -17,12 +17,12 @@
       />
     </div>
     <div
-      :class="[
-        'grid max-h-32 grid-cols-2 gap-1 overflow-y-auto p-2',
-        isSearchable
-          ? 'rounded-b-lg border border-t-0 border-gray-200 bg-gray-50 dark:border-dark-600 dark:bg-dark-800'
-          : 'rounded-lg border border-gray-200 bg-gray-50 dark:border-dark-600 dark:bg-dark-800'
-      ]"
+        :class="[
+          'grid max-h-32 grid-cols-2 gap-1 overflow-y-auto p-2',
+          isSearchable
+          ? 'rounded-b-md border border-t-0 border-transparent bg-gray-50 dark:bg-dark-800'
+          : 'rounded-md border border-transparent bg-gray-50 dark:bg-dark-800'
+        ]"
     >
       <label
         v-for="group in filteredGroups"
@@ -35,7 +35,7 @@
           :value="group.id"
           :checked="modelValue.includes(group.id)"
           @change="handleChange(group.id, ($event.target as HTMLInputElement).checked)"
-          class="h-3.5 w-3.5 shrink-0 rounded border-gray-300 text-primary-500 focus:ring-primary-500 dark:border-dark-500"
+          class="h-3.5 w-3.5 shrink-0 rounded border-gray-300 text-primary-500 focus:ring-primary-500/20 dark:border-dark-500"
         />
         <GroupBadge
           :name="group.name"

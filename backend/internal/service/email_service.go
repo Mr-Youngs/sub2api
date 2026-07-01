@@ -372,7 +372,7 @@ func (s *EmailService) SendVerifyCode(ctx context.Context, email, siteName strin
 
 	// 构建邮件内容
 	subject := fmt.Sprintf("[%s] Email Verification Code", siteName)
-	body := s.buildVerifyCodeEmailBody(code, siteName)
+	body := s.buildVerifyCodeEmailBody(ctx, code, siteName)
 
 	// 发送邮件
 	if err := s.SendEmail(ctx, email, subject, body); err != nil {
@@ -418,43 +418,21 @@ func (s *EmailService) VerifyCode(ctx context.Context, email, code string) error
 }
 
 // buildVerifyCodeEmailBody 构建验证码邮件HTML内容
-func (s *EmailService) buildVerifyCodeEmailBody(code, siteName string) string {
-	return fmt.Sprintf(`
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; padding: 30px; text-align: center; }
-        .header h1 { margin: 0; font-size: 24px; }
-        .content { padding: 40px 30px; text-align: center; }
-        .code { font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #333; background-color: #f8f9fa; padding: 20px 30px; border-radius: 8px; display: inline-block; margin: 20px 0; font-family: monospace; }
-        .info { color: #666; font-size: 14px; line-height: 1.6; margin-top: 20px; }
-        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #999; font-size: 12px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>%s</h1>
-        </div>
-        <div class="content">
-            <p style="font-size: 18px; color: #333;">Your verification code is:</p>
-            <div class="code">%s</div>
-            <div class="info">
-                <p>This code will expire in <strong>15 minutes</strong>.</p>
-                <p>If you did not request this code, please ignore this email.</p>
-            </div>
-        </div>
-        <div class="footer">
-            <p>This is an automated message, please do not reply.</p>
-        </div>
-    </div>
-</body>
-</html>
-`, siteName, code)
+func (s *EmailService) buildVerifyCodeEmailBody(ctx context.Context, code, siteName string) string {
+	return renderBrandedNotificationEmailBody(
+		NotificationEmailEventAuthVerifyCode,
+		"Email verification code",
+		siteName,
+		`
+<p style="font-size: 16px; color: #292c3b;">Your verification code is:</p>
+<p style="display: inline-block; margin: 8px 0 18px; padding: 14px 22px; border-radius: 7px; background: #f7f6f0; color: #292c3b; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 32px; font-weight: 800; letter-spacing: 6px;">{{verification_code}}</p>
+<p class="muted">This code will expire in <strong>{{expires_in_minutes}} minutes</strong>.</p>
+<p class="muted">If you did not request this code, please ignore this email.</p>`,
+		map[string]string{
+			"verification_code":  code,
+			"expires_in_minutes": strconv.Itoa(int(verifyCodeTTL / time.Minute)),
+		},
+	)
 }
 
 // TestSMTPConnectionWithConfig 使用指定配置测试SMTP连接
@@ -567,7 +545,7 @@ func (s *EmailService) SendPasswordResetEmail(ctx context.Context, email, siteNa
 
 	// Build email content
 	subject := fmt.Sprintf("[%s] 密码重置请求", siteName)
-	body := s.buildPasswordResetEmailBody(fullResetURL, siteName)
+	body := s.buildPasswordResetEmailBody(ctx, fullResetURL, siteName)
 
 	// Send email
 	if err := s.SendEmail(ctx, email, subject, body); err != nil {
@@ -629,49 +607,20 @@ func (s *EmailService) ConsumePasswordResetToken(ctx context.Context, email, tok
 }
 
 // buildPasswordResetEmailBody builds the HTML content for password reset email
-func (s *EmailService) buildPasswordResetEmailBody(resetURL, siteName string) string {
-	return fmt.Sprintf(`
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; padding: 30px; text-align: center; }
-        .header h1 { margin: 0; font-size: 24px; }
-        .content { padding: 40px 30px; text-align: center; }
-        .button { display: inline-block; background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; margin: 20px 0; }
-        .button:hover { opacity: 0.9; }
-        .info { color: #666; font-size: 14px; line-height: 1.6; margin-top: 20px; }
-        .link-fallback { color: #666; font-size: 12px; word-break: break-all; margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 4px; }
-        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #999; font-size: 12px; }
-        .warning { color: #e74c3c; font-weight: 500; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>%s</h1>
-        </div>
-        <div class="content">
-            <p style="font-size: 18px; color: #333;">密码重置请求</p>
-            <p style="color: #666;">您已请求重置密码。请点击下方按钮设置新密码：</p>
-            <a href="%s" class="button">重置密码</a>
-            <div class="info">
-                <p>此链接将在 <strong>30 分钟</strong>后失效。</p>
-                <p class="warning">如果您没有请求重置密码，请忽略此邮件。您的密码将保持不变。</p>
-            </div>
-            <div class="link-fallback">
-                <p>如果按钮无法点击，请复制以下链接到浏览器中打开：</p>
-                <p>%s</p>
-            </div>
-        </div>
-        <div class="footer">
-            <p>这是一封自动发送的邮件，请勿回复。</p>
-        </div>
-    </div>
-</body>
-</html>
-`, siteName, resetURL, resetURL)
+func (s *EmailService) buildPasswordResetEmailBody(ctx context.Context, resetURL, siteName string) string {
+	return renderBrandedNotificationEmailBody(
+		NotificationEmailEventAuthPasswordReset,
+		"密码重置",
+		siteName,
+		`
+<p>您已请求重置密码。请点击下方按钮设置新密码：</p>
+<p><a href="{{reset_url}}" class="button">重置密码</a></p>
+<p class="muted">此链接将在 <strong>{{expires_in_minutes}} 分钟</strong>后失效。</p>
+<p class="muted">如果您没有请求重置密码，请忽略此邮件，当前密码不会改变。</p>
+<p class="muted" style="word-break: break-all; background: #f7f6f0; padding: 12px; border-radius: 7px;">如果按钮无法点击，请复制此链接：{{reset_url}}</p>`,
+		map[string]string{
+			"reset_url":          resetURL,
+			"expires_in_minutes": strconv.Itoa(int(passwordResetTokenTTL / time.Minute)),
+		},
+	)
 }

@@ -15,7 +15,7 @@
         <!-- Custom Logo or Default Logo -->
         <template v-if="settingsLoaded">
           <div
-            class="mb-4 inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg shadow-sm"
+            class="mb-4 inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-md"
           >
             <img :src="siteLogo || '/logo.png'" alt="Logo" class="h-full w-full object-contain" />
           </div>
@@ -29,7 +29,7 @@
       </div>
 
       <!-- Card Container -->
-      <div class="card-glass rounded-lg p-8 shadow-sm">
+      <div class="card-glass rounded-md p-8">
         <slot />
       </div>
 

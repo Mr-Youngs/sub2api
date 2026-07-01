@@ -3,12 +3,14 @@ package service
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"errors"
 	"net"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -66,6 +68,69 @@ func TestNotificationEmailTemplateOverrideAndRestore(t *testing.T) {
 	require.ErrorIs(t, err, ErrSettingNotFound)
 }
 
+func TestNotificationEmailTemplateIgnoresLegacyGeneratedOverride(t *testing.T) {
+	ctx := context.Background()
+	repo := newNotificationEmailMemorySettingRepo()
+	svc := NewNotificationEmailService(repo, nil)
+
+	legacyStored := notificationEmailStoredTemplate{
+		Subject: "[{{site_name}}] 邮箱验证码",
+		HTML: `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container { border-radius: 12px; box-shadow: 0 8px 30px rgba(15, 23, 42, 0.10); }
+    .header { background: #4f46e5; color: #ffffff; padding: 28px 32px; }
+  </style>
+</head>
+<body>
+  <div class="container"><div class="header"><h1>邮箱验证码</h1></div><p>{{recipient_name}}</p><p>{{verification_code}}</p></div>
+</body>
+</html>`,
+		UpdatedAt: time.Now().UTC(),
+	}
+	payload, err := json.Marshal(legacyStored)
+	require.NoError(t, err)
+	require.NoError(t, repo.Set(ctx, notificationEmailTemplateKey(NotificationEmailEventAuthVerifyCode, "zh"), string(payload)))
+
+	tmpl, err := svc.GetTemplate(ctx, NotificationEmailEventAuthVerifyCode, "zh")
+	require.NoError(t, err)
+	require.False(t, tmpl.IsCustom)
+	require.Contains(t, tmpl.HTML, `class="site"`)
+	require.Contains(t, tmpl.HTML, "#292c3b")
+	require.NotContains(t, tmpl.HTML, `class="logo"`)
+	require.NotContains(t, tmpl.HTML, "site_logo_url")
+	require.NotContains(t, tmpl.HTML, "#4f46e5")
+
+	logoStored := notificationEmailStoredTemplate{
+		Subject: "[{{site_name}}] 邮箱验证码",
+		HTML: `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container { box-shadow: 0 8px 24px rgba(41, 44, 59, 0.08); }
+    .brand-name { color: #fefefd; }
+  </style>
+</head>
+<body>
+  <img class="logo" src="{{site_logo_url}}" alt="{{site_name}}">
+  <span class="brand-name">{{site_name}}</span>
+  <p>{{verification_code}}</p>
+</body>
+</html>`,
+		UpdatedAt: time.Now().UTC(),
+	}
+	payload, err = json.Marshal(logoStored)
+	require.NoError(t, err)
+	require.NoError(t, repo.Set(ctx, notificationEmailTemplateKey(NotificationEmailEventAuthVerifyCode, "zh"), string(payload)))
+
+	tmpl, err = svc.GetTemplate(ctx, NotificationEmailEventAuthVerifyCode, "zh")
+	require.NoError(t, err)
+	require.False(t, tmpl.IsCustom)
+	require.NotContains(t, tmpl.HTML, `class="logo"`)
+	require.NotContains(t, tmpl.HTML, "site_logo_url")
+}
+
 func TestNotificationEmailTemplateRejectsUnsupportedPlaceholder(t *testing.T) {
 	ctx := context.Background()
 	svc := NewNotificationEmailService(newNotificationEmailMemorySettingRepo(), nil)
@@ -94,6 +159,7 @@ func TestNotificationEmailAuthTemplatesAreListedAndPreviewable(t *testing.T) {
 	require.Contains(t, events, NotificationEmailEventAuthPasswordReset)
 	require.False(t, events[NotificationEmailEventAuthVerifyCode].Optional)
 	require.False(t, events[NotificationEmailEventAuthPasswordReset].Optional)
+	require.NotContains(t, events[NotificationEmailEventAuthVerifyCode].Placeholders, "site_logo_url")
 	require.Contains(t, events[NotificationEmailEventAuthVerifyCode].Placeholders, "verification_code")
 	require.Contains(t, events[NotificationEmailEventAuthPasswordReset].Placeholders, "reset_url")
 
@@ -108,6 +174,9 @@ func TestNotificationEmailAuthTemplatesAreListedAndPreviewable(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, verifyPreview.Subject, "邮箱验证码")
 	require.Contains(t, verifyPreview.HTML, "654321")
+	require.Contains(t, verifyPreview.HTML, `class="site"`)
+	require.NotContains(t, verifyPreview.HTML, `class="logo"`)
+	require.NotContains(t, verifyPreview.HTML, `src="https://example.com/logo.png"`)
 
 	resetPreview, err := svc.PreviewTemplate(ctx, NotificationEmailPreviewInput{
 		Event:  NotificationEmailEventAuthPasswordReset,
@@ -120,6 +189,17 @@ func TestNotificationEmailAuthTemplatesAreListedAndPreviewable(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, resetPreview.Subject, "Password reset")
 	require.Contains(t, resetPreview.HTML, "https://example.com/reset?token=abc")
+}
+
+func TestNotificationEmailLogoURLResolution(t *testing.T) {
+	require.Equal(t, "https://example.com/logo.png", resolveNotificationEmailLogoURL("", "https://example.com/"))
+	require.Equal(t, "https://example.com/custom/logo.png", resolveNotificationEmailLogoURL("/custom/logo.png", "https://example.com"))
+	require.Equal(t, "https://cdn.example.com/logo.png", resolveNotificationEmailLogoURL("https://cdn.example.com/logo.png", "https://example.com"))
+
+	dataURL := "data:image/png;base64,iVBORw0KGgo="
+	require.Equal(t, dataURL, resolveNotificationEmailLogoURL(dataURL, ""))
+	require.Equal(t, "https://example.com/logo.png", resolveNotificationEmailLogoURL("javascript:alert(1)", "https://example.com"))
+	require.Equal(t, "https://example.com/logo.png", resolveNotificationEmailLogoURL("data:image/svg+xml;base64,PHN2Zy8+", "https://example.com"))
 }
 
 func TestNotificationEmailAdditionalEventsAreListedAndPreviewable(t *testing.T) {

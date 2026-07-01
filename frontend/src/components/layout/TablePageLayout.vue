@@ -60,35 +60,85 @@ onUnmounted(() => {
 
 /* 表格滚动容器 - 增强版表体滚动方案 */
 .table-scroll-container {
-  @apply flex flex-col overflow-hidden h-full bg-white dark:bg-dark-800 rounded-2xl border border-gray-200 dark:border-dark-700 shadow-sm;
+  @apply flex flex-col overflow-hidden h-full rounded-md;
+  background: #fefefd;
+  box-shadow: 0 4px 10px rgba(31, 34, 48, 0.04);
+}
+
+:global(.dark) .table-scroll-container {
+  background: #292c3b;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 .table-scroll-container :deep(.table-wrapper) {
   @apply flex-1 overflow-x-auto overflow-y-auto;
   /* 确保横向滚动条显示在最底部 */
+  background: #fefefd;
   scrollbar-gutter: stable;
+}
+
+:global(.dark) .table-scroll-container :deep(.table-wrapper) {
+  background: #292c3b;
 }
 
 .table-scroll-container :deep(table) {
   @apply w-full;
   min-width: max-content; /* 关键：确保表格宽度根据内容撑开，从而触发横向滚动 */
   display: table; /* 使用标准 table 布局以支持 sticky 列 */
+  background: #fefefd;
+}
+
+:global(.dark) .table-scroll-container :deep(table) {
+  background: #292c3b;
 }
 
 .table-scroll-container :deep(thead) {
-  @apply bg-gray-50/80 dark:bg-dark-800/80 backdrop-blur-sm;
+  background: #f8f7f2;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:global(.dark) .table-scroll-container :deep(thead) {
+  background: #1f2230;
 }
 
 .table-scroll-container :deep(tbody) {
   /* 保持默认 table-row-group 显示，不使用 block */
+  background: #fefefd;
+}
+
+:global(.dark) .table-scroll-container :deep(tbody) {
+  background: #292c3b;
 }
 
 .table-scroll-container :deep(th) {
-  @apply px-5 py-4 text-left text-sm font-medium text-gray-600 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700;
+  @apply px-5 py-4 text-left text-sm font-medium text-gray-600 dark:text-dark-300 border-b border-transparent;
+  background: #f8f7f2;
+  border-color: transparent;
+}
+
+:global(.dark) .table-scroll-container :deep(th) {
+  background: #1f2230;
+  border-color: transparent;
 }
 
 .table-scroll-container :deep(td) {
-  @apply px-5 py-4 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-dark-800;
+  @apply px-5 py-4 text-sm text-gray-700 dark:text-gray-300 border-b border-transparent;
+  background: #fefefd;
+  border-color: transparent;
+}
+
+:global(.dark) .table-scroll-container :deep(td) {
+  background: #292c3b;
+  border-color: transparent;
+}
+
+.table-scroll-container :deep(tbody tr:hover td) {
+  background: #fbf3d4;
+}
+
+:global(.dark) .table-scroll-container :deep(tbody tr:hover td) {
+  background: #373745;
 }
 
 /* 移动端：恢复正常滚动 */

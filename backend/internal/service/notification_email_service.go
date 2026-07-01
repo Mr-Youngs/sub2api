@@ -273,6 +273,9 @@ func (s *NotificationEmailService) GetTemplate(ctx context.Context, event, local
 	if err := validateNotificationEmailTemplate(normalizedEvent, stored.Subject, stored.HTML); err != nil {
 		return NotificationEmailTemplate{}, err
 	}
+	if isLegacyGeneratedNotificationEmailTemplateOverride(stored.HTML) {
+		return tmpl, nil
+	}
 	tmpl.Subject = stored.Subject
 	tmpl.HTML = stored.HTML
 	tmpl.IsCustom = true
@@ -493,6 +496,9 @@ func (s *NotificationEmailService) sampleVariables(ctx context.Context, event, l
 		variables[key] = value
 	}
 	variables["site_name"] = s.siteName(ctx)
+	if logoURL := s.siteLogoURL(ctx); logoURL != "" {
+		variables["site_logo_url"] = logoURL
+	}
 	if variables["unsubscribe_url"] == "" && info.Optional {
 		variables["unsubscribe_url"] = "https://example.com/unsubscribe"
 	}
@@ -505,6 +511,7 @@ func (s *NotificationEmailService) runtimeVariables(ctx context.Context, event, 
 		variables[key] = value
 	}
 	variables["site_name"] = s.siteName(ctx)
+	variables["site_logo_url"] = s.siteLogoURL(ctx)
 	variables["recipient_email"] = input.RecipientEmail
 	if strings.TrimSpace(input.RecipientName) != "" {
 		variables["recipient_name"] = input.RecipientName
@@ -528,12 +535,63 @@ func (s *NotificationEmailService) siteName(ctx context.Context) string {
 	return strings.TrimSpace(name)
 }
 
+func (s *NotificationEmailService) siteLogoURL(ctx context.Context) string {
+	if s == nil {
+		return ""
+	}
+	return notificationEmailLogoURL(ctx, s.settingRepo)
+}
+
+func notificationEmailLogoURL(ctx context.Context, settingRepo SettingRepository) string {
+	if settingRepo == nil {
+		return ""
+	}
+	logo, err := settingRepo.GetValue(ctx, SettingKeySiteLogo)
+	if err != nil {
+		logo = ""
+	}
+	return resolveNotificationEmailLogoURL(logo, notificationEmailBaseURL(ctx, settingRepo))
+}
+
+func resolveNotificationEmailLogoURL(rawLogo, baseURL string) string {
+	logo := strings.TrimSpace(rawLogo)
+	base := strings.TrimRight(strings.TrimSpace(baseURL), "/")
+
+	if logo != "" {
+		if isSafeNotificationEmailImageDataURL(logo) {
+			return logo
+		}
+		parsed, err := url.Parse(logo)
+		if err == nil && parsed.IsAbs() {
+			scheme := strings.ToLower(parsed.Scheme)
+			if scheme == "http" || scheme == "https" {
+				return logo
+			}
+		}
+		if strings.HasPrefix(logo, "/") && base != "" {
+			return base + logo
+		}
+	}
+
+	if base != "" {
+		return base + "/logo.png"
+	}
+	return ""
+}
+
 func (s *NotificationEmailService) baseURL(ctx context.Context) string {
-	if s == nil || s.settingRepo == nil {
+	if s == nil {
+		return ""
+	}
+	return notificationEmailBaseURL(ctx, s.settingRepo)
+}
+
+func notificationEmailBaseURL(ctx context.Context, settingRepo SettingRepository) string {
+	if settingRepo == nil {
 		return ""
 	}
 	for _, key := range []string{SettingKeyAPIBaseURL, SettingKeyFrontendURL} {
-		value, err := s.settingRepo.GetValue(ctx, key)
+		value, err := settingRepo.GetValue(ctx, key)
 		if err == nil && strings.TrimSpace(value) != "" {
 			return strings.TrimRight(strings.TrimSpace(value), "/")
 		}
@@ -696,7 +754,7 @@ func renderNotificationEmailString(event, raw string, variables map[string]strin
 				}
 			}
 		}
-		if strings.HasSuffix(name, "_url") && !isSafeNotificationEmailURL(value) {
+		if strings.HasSuffix(name, "_url") && !isSafeNotificationEmailURLForPlaceholder(name, value) {
 			value = ""
 		}
 		if escapeHTML {
@@ -710,6 +768,35 @@ func renderNotificationEmailString(event, raw string, variables map[string]strin
 	return rendered, nil
 }
 
+func renderBrandedNotificationEmailBody(event, title, siteName, content string, variables map[string]string) string {
+	renderVars := map[string]string{
+		"site_name": siteName,
+	}
+	for key, value := range variables {
+		renderVars[key] = value
+	}
+	body, err := renderNotificationEmailString(event, notificationEmailCard("#f0c845", title, content), renderVars, nil, true)
+	if err != nil {
+		slog.Warn("failed to render built-in branded notification email", "event", event, "error", err)
+		return notificationEmailCard("#f0c845", title, content)
+	}
+	return body
+}
+
+func isLegacyGeneratedNotificationEmailTemplateOverride(htmlBody string) bool {
+	normalized := strings.ToLower(htmlBody)
+	legacyPurpleShell := strings.Contains(normalized, "box-shadow: 0 8px 30px rgba(15, 23, 42, 0.10)") &&
+		strings.Contains(normalized, "border-radius: 12px") &&
+		strings.Contains(normalized, ".header { background:") &&
+		!strings.Contains(normalized, `class="logo"`) &&
+		!strings.Contains(normalized, "site_logo_url")
+	logoShell := strings.Contains(normalized, `class="logo"`) &&
+		strings.Contains(normalized, "site_logo_url") &&
+		strings.Contains(normalized, "brand-name") &&
+		strings.Contains(normalized, "box-shadow: 0 8px 24px rgba(41, 44, 59, 0.08)")
+	return legacyPurpleShell || logoShell
+}
+
 func notificationEmailRawHTMLAllowed(event, placeholder string) bool {
 	return event == NotificationEmailEventOpsScheduledReport && placeholder == "report_html"
 }
@@ -720,6 +807,8 @@ func notificationEmailAllowedPlaceholderSet(event string) map[string]struct{} {
 	for _, placeholder := range info.Placeholders {
 		allowed[placeholder] = struct{}{}
 	}
+	// Keep accepting the former logo placeholder so saved custom templates do not break.
+	allowed["site_logo_url"] = struct{}{}
 	return allowed
 }
 
@@ -842,10 +931,27 @@ func isSafeNotificationEmailURL(raw string) bool {
 	return strings.HasPrefix(trimmed, "/")
 }
 
+func isSafeNotificationEmailURLForPlaceholder(name, raw string) bool {
+	if name == "site_logo_url" && isSafeNotificationEmailImageDataURL(raw) {
+		return true
+	}
+	return isSafeNotificationEmailURL(raw)
+}
+
+func isSafeNotificationEmailImageDataURL(raw string) bool {
+	trimmed := strings.ToLower(strings.TrimSpace(raw))
+	return strings.HasPrefix(trimmed, "data:image/png;base64,") ||
+		strings.HasPrefix(trimmed, "data:image/jpeg;base64,") ||
+		strings.HasPrefix(trimmed, "data:image/jpg;base64,") ||
+		strings.HasPrefix(trimmed, "data:image/gif;base64,") ||
+		strings.HasPrefix(trimmed, "data:image/webp;base64,")
+}
+
 func notificationEmailSampleVariables(locale string) map[string]string {
 	if normalizeNotificationLocale(locale) == notificationEmailLocaleChinese {
 		return map[string]string{
 			"site_name":           defaultSiteName,
+			"site_logo_url":       "https://example.com/logo.png",
 			"recipient_name":      "张三",
 			"recipient_email":     "user@example.com",
 			"verification_code":   "123456",
@@ -892,6 +998,7 @@ func notificationEmailSampleVariables(locale string) map[string]string {
 	}
 	return map[string]string{
 		"site_name":           defaultSiteName,
+		"site_logo_url":       "https://example.com/logo.png",
 		"recipient_name":      "Alex",
 		"recipient_email":     "user@example.com",
 		"verification_code":   "123456",
@@ -1358,26 +1465,39 @@ var notificationEmailOfficialTemplates = map[string]map[string]notificationEmail
 	},
 }
 
-func notificationEmailCard(accent, title, content string) string {
+func notificationEmailCard(_ string, title, content string) string {
 	return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { margin: 0; padding: 24px; background: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #18181b; }
-    .container { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(15, 23, 42, 0.10); }
-    .header { background: ` + accent + `; color: #ffffff; padding: 28px 32px; }
-    .header h1 { margin: 0; font-size: 24px; line-height: 1.25; }
-    .content { padding: 32px; font-size: 15px; line-height: 1.7; }
-    .button { display: inline-block; margin-top: 12px; padding: 11px 18px; border-radius: 8px; background: ` + accent + `; color: #ffffff; text-decoration: none; font-weight: 600; }
-    .muted { color: #71717a; font-size: 13px; }
-    .footer { padding: 18px 32px; background: #fafafa; color: #a1a1aa; font-size: 12px; }
+    body { margin: 0; padding: 18px; background: #f4f5f2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #292c3b; }
+    .container { max-width: 620px; margin: 0 auto; background: #fefefd; border-radius: 6px; overflow: hidden; }
+    .header { background: #292c3b; color: #fefefd; padding: 20px 24px 22px; }
+    .site { margin: 0 0 12px; color: rgba(254, 254, 253, 0.72); font-size: 13px; line-height: 1.4; font-weight: 700; letter-spacing: 0; }
+    .accent { width: 36px; height: 3px; margin: 0 0 12px; border-radius: 3px; background: #f0c845; }
+    .header h1 { margin: 0; font-size: 22px; line-height: 1.3; font-weight: 750; letter-spacing: 0; }
+    .content { padding: 24px; font-size: 15px; line-height: 1.7; }
+    .content p { margin: 0 0 14px; }
+    .content strong { color: #292c3b; font-weight: 750; }
+    .content table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin: 12px 0 18px; background: transparent; }
+    .content td { padding: 9px 10px; background: #f7f6f0; vertical-align: top; }
+    .content tr td:first-child { border-radius: 6px 0 0 6px; }
+    .content tr td:last-child { border-radius: 0 6px 6px 0; }
+    .button { display: inline-block; margin-top: 12px; padding: 11px 18px; border-radius: 7px; background: #f0c845; color: #292c3b !important; text-decoration: none; font-weight: 700; }
+    .muted { color: rgba(41, 44, 59, 0.62); font-size: 13px; }
+    .muted a { color: #dda931; }
+    .footer { padding: 14px 24px 18px; background: #f7f6f0; color: rgba(41, 44, 59, 0.52); font-size: 12px; line-height: 1.6; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header"><h1>` + title + `</h1></div>
+    <div class="header">
+      <p class="site">{{site_name}}</p>
+      <div class="accent"></div>
+      <h1>` + title + `</h1>
+    </div>
     <div class="content">` + content + `</div>
     <div class="footer">This email was sent by {{site_name}}. Please do not reply directly.</div>
   </div>

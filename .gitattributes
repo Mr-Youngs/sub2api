@@ -1,22 +1,75 @@
-# 确保所有 SQL 迁移文件使用 LF 换行符
-backend/migrations/*.sql text eol=lf
+# Default: detect text files and normalize them to LF in the repository.
+* text=auto eol=lf
 
-# Go 源代码文件
+# Windows command scripts need CRLF for the native shells.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Unix scripts.
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Backend source.
 *.go text eol=lf
+go.mod text eol=lf
+go.sum text eol=lf
 
-# 前端 源代码文件
+# Frontend source.
+*.vue text eol=lf
 *.ts text eol=lf
 *.tsx text eol=lf
 *.js text eol=lf
 *.jsx text eol=lf
-*.vue text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
 
-# Shell 脚本
-*.sh text eol=lf
-
-# YAML/YML 配置文件
+# Config, docs, and data files that should stay text.
+*.json text eol=lf
+*.jsonc text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf
-
-# Dockerfile
+*.toml text eol=lf
+*.ini text eol=lf
+*.env text eol=lf
+*.env.* text eol=lf
+*.md text eol=lf
+*.sql text eol=lf
+*.txt text eol=lf
 Dockerfile text eol=lf
+*.Dockerfile text eol=lf
+
+# Images.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg text eol=lf
+
+# Fonts.
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# Archives and binary documents.
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+*.7z binary
+*.rar binary
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
